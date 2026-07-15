@@ -1,0 +1,13 @@
+{
+  "name": "qr-tray",
+  "version": "1.0.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && electron ."
+  },
+  "devDependencies": {
+    "electron": "^43.1.0",
+    "typescript": "^5.9.3"
+  }
+}

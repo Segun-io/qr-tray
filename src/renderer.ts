@@ -14,21 +14,103 @@ interface SavedCode {
   value: string;
 }
 
-type View = "scan" | "list" | "form";
+type View = "scan" | "list" | "form" | "settings";
 type CodeType = "PPL" | "LOC" | "DOCK" | "RAW";
+type Lang = "es" | "en";
 
-const TYPE_LABEL: Record<CodeType, string> = {
-  PPL: "PPL · Package",
-  LOC: "LOC · Location",
-  DOCK: "DOCK · Warehouse",
-  RAW: "Raw value",
-};
 const TYPE_COLOR: Record<CodeType, string> = {
   PPL: "#635bff",
   LOC: "#0f9d58",
   DOCK: "#e8833a",
   RAW: "#6b7280",
 };
+
+const TYPE_LABEL_KEY: Record<CodeType, string> = {
+  PPL: "typePpl",
+  LOC: "typeLoc",
+  DOCK: "typeDock",
+  RAW: "typeRaw",
+};
+
+const translations: Record<Lang, Record<string, string>> = {
+  es: {
+    myCodes: "Mis códigos",
+    exit: "Salir",
+    newCode: "+ Nuevo",
+    scanPlaceholder: "pega o escribí para codificar…",
+    scanTitleDefault: "Escaneá para codificar",
+    awaitingInput: "esperando input",
+    typeOrPaste: "escribí o pegá",
+    noRecents: "sin escaneos recientes",
+    copy: "Copiar",
+    copied: "✓ Copiado",
+    save: "Guardar",
+    savedListEmpty: "Sin códigos guardados.",
+    tap: "Toca",
+    savedListEmptyTail: "para agregar uno.",
+    formTitleNew: "Nuevo código",
+    formName: "Nombre (opcional)",
+    formNamePlaceholder: "Ej: Pedido #4521",
+    formValue: "Texto o ID a convertir",
+    formValuePlaceholder: "PPL-4471-A22",
+    cancel: "Cancelar",
+    settingsTitle: "Configuración",
+    languageLabel: "Idioma",
+    clearAllLabel: "Limpiar todo",
+    clearAllDesc: "Borra todos los códigos guardados y el historial reciente.",
+    clearAllConfirm:
+      "¿Seguro que querés borrar todos los códigos guardados y el historial? Esta acción no se puede deshacer.",
+    typePpl: "PPL · Paquete",
+    typeLoc: "LOC · Ubicación",
+    typeDock: "DOCK · Depósito",
+    typeRaw: "Valor crudo",
+  },
+  en: {
+    myCodes: "My codes",
+    exit: "Exit",
+    newCode: "+ New",
+    scanPlaceholder: "paste or type to encode…",
+    scanTitleDefault: "Scan to encode",
+    awaitingInput: "awaiting input",
+    typeOrPaste: "type or paste",
+    noRecents: "no recent scans yet",
+    copy: "Copy",
+    copied: "✓ Copied",
+    save: "Save",
+    savedListEmpty: "No saved codes.",
+    tap: "Tap",
+    savedListEmptyTail: "to add one.",
+    formTitleNew: "New code",
+    formName: "Name (optional)",
+    formNamePlaceholder: "E.g: Order #4521",
+    formValue: "Text or ID to encode",
+    formValuePlaceholder: "PPL-4471-A22",
+    cancel: "Cancel",
+    settingsTitle: "Settings",
+    languageLabel: "Language",
+    clearAllLabel: "Clear all",
+    clearAllDesc: "Deletes all saved codes and the recent history.",
+    clearAllConfirm:
+      "Are you sure you want to delete all saved codes and the history? This cannot be undone.",
+    typePpl: "PPL · Package",
+    typeLoc: "LOC · Location",
+    typeDock: "DOCK · Warehouse",
+    typeRaw: "Raw value",
+  },
+};
+
+const LANG_KEY = "qrtray.lang";
+
+function loadLang(): Lang {
+  const raw = localStorage.getItem(LANG_KEY);
+  return raw === "en" ? "en" : "es";
+}
+
+let lang: Lang = loadLang();
+
+function t(key: string): string {
+  return translations[lang][key] ?? key;
+}
 
 function detectType(raw: string): CodeType {
   const t = raw.trim().toUpperCase();
@@ -103,6 +185,13 @@ const els = {
   formValue: document.getElementById("form-value") as HTMLTextAreaElement,
   btnFormCancel: document.getElementById("btn-form-cancel") as HTMLButtonElement,
   btnFormSave: document.getElementById("btn-form-save") as HTMLButtonElement,
+
+  viewSettings: document.getElementById("view-settings") as HTMLElement,
+  btnSettings: document.getElementById("btn-settings") as HTMLButtonElement,
+  btnExitSettings: document.getElementById("btn-exit-settings") as HTMLButtonElement,
+  btnLangEs: document.getElementById("btn-lang-es") as HTMLButtonElement,
+  btnLangEn: document.getElementById("btn-lang-en") as HTMLButtonElement,
+  btnClearAll: document.getElementById("btn-clear-all") as HTMLButtonElement,
 };
 
 function persistRecents(): void {
@@ -117,11 +206,34 @@ function setView(next: View): void {
   els.viewScan.hidden = next !== "scan";
   els.viewList.hidden = next !== "list";
   els.viewForm.hidden = next !== "form";
+  els.viewSettings.hidden = next !== "settings";
   if (next === "scan") {
     renderQr();
   } else if (next === "list") {
     renderSavedList();
   }
+}
+
+function applyTranslations(): void {
+  document.documentElement.lang = lang;
+  document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((el) => {
+    const key = el.dataset.i18n;
+    if (key) el.textContent = t(key);
+  });
+  document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("[data-i18n-placeholder]").forEach((el) => {
+    const key = el.dataset.i18nPlaceholder;
+    if (key) el.placeholder = t(key);
+  });
+  els.btnLangEs.classList.toggle("active", lang === "es");
+  els.btnLangEn.classList.toggle("active", lang === "en");
+}
+
+function setLang(next: Lang): void {
+  if (lang === next) return;
+  lang = next;
+  localStorage.setItem(LANG_KEY, lang);
+  applyTranslations();
+  updateScanUI();
 }
 
 function renderQr(): void {
@@ -149,7 +261,7 @@ function updateScanUI(): void {
   els.btnClear.hidden = !hasText;
   els.btnCopy.disabled = !hasText;
   els.btnSave.disabled = !hasText;
-  els.scanTitle.textContent = hasText ? TYPE_LABEL[detectType(text)] : "Scan to encode";
+  els.scanTitle.textContent = hasText ? t(TYPE_LABEL_KEY[detectType(text)]) : t("scanTitleDefault");
   renderQr();
 }
 
@@ -287,11 +399,10 @@ els.btnClear.addEventListener("click", () => clearScanInput());
 els.btnCopy.addEventListener("click", async () => {
   if (!text) return;
   await navigator.clipboard.writeText(text);
-  const original = "Copiar";
-  els.btnCopy.textContent = "✓ Copiado";
+  els.btnCopy.textContent = t("copied");
   if (copyResetTimer) clearTimeout(copyResetTimer);
   copyResetTimer = setTimeout(() => {
-    els.btnCopy.textContent = original;
+    els.btnCopy.textContent = t("copy");
   }, 1200);
 });
 
@@ -301,6 +412,7 @@ els.btnSave.addEventListener("click", () => {
 });
 
 els.btnMyCodes.addEventListener("click", () => setView("list"));
+els.btnSettings.addEventListener("click", () => setView("settings"));
 
 els.btnExitList.addEventListener("click", () => setView("scan"));
 els.btnNew.addEventListener("click", () => openForm(""));
@@ -320,6 +432,24 @@ els.btnFormSave.addEventListener("click", () => {
   setView("list");
 });
 
+els.btnExitSettings.addEventListener("click", () => setView(saved.length > 0 ? "list" : "scan"));
+els.btnLangEs.addEventListener("click", () => setLang("es"));
+els.btnLangEn.addEventListener("click", () => setLang("en"));
+
+els.btnClearAll.addEventListener("click", () => {
+  if (!confirm(t("clearAllConfirm"))) return;
+  saved = [];
+  recents = [];
+  persistSaved();
+  persistRecents();
+  clearScanInput();
+  renderSavedCount();
+  renderRecentsChips();
+  renderSavedList();
+  setView("scan");
+});
+
+applyTranslations();
 renderSavedCount();
 renderRecentsChips();
 updateScanUI();

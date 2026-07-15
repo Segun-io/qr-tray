@@ -182,6 +182,14 @@
         font-weight: 600;
         color: var(--gray-1);
       }
+      .pill-icon-only {
+        padding: 6px;
+      }
+      .pill-icon-only svg {
+        width: 13px;
+        height: 13px;
+        color: var(--gray-1);
+      }
       .pill-shortcut {
         padding: 5px 11px;
         font-size: 11px;
@@ -601,6 +609,68 @@
         box-shadow: none;
         cursor: not-allowed;
       }
+
+      #view-settings {
+        background: #f4f5f7;
+      }
+      .settings-body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 14px 14px;
+      }
+      .settings-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: 0 1px 3px rgba(24, 28, 40, 0.06);
+      }
+      .settings-row-label {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .settings-row-info {
+        min-width: 0;
+      }
+      .settings-row-desc {
+        margin: 4px 0 0;
+        font-size: 11px;
+        line-height: 1.4;
+        color: var(--gray-muted-1);
+      }
+      .lang-toggle {
+        display: flex;
+        background: var(--soft-bg-1);
+        border-radius: 999px;
+        padding: 3px;
+        gap: 2px;
+      }
+      .lang-btn {
+        border: none;
+        background: transparent;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-2);
+        cursor: pointer;
+      }
+      .lang-btn.active {
+        background: var(--ink-dark);
+        color: #fff;
+      }
+      .btn-danger {
+        flex-shrink: 0;
+        background: #fdeceb;
+        color: #d9483b;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 9px 14px;
+      }
     </style>
   </head>
   <body>
@@ -618,19 +688,24 @@
               </svg>
               <span id="saved-count">0</span>
             </button>
+            <button id="btn-settings" class="pill pill-action pill-icon-only" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z" />
+              </svg>
+            </button>
             <span class="pill pill-shortcut">⌘⇧Q</span>
           </div>
         </header>
 
         <div class="input-zone">
-          <textarea id="scan-input" rows="1" placeholder="paste or type to encode…"></textarea>
+          <textarea id="scan-input" rows="1" data-i18n-placeholder="scanPlaceholder" placeholder="paste or type to encode…"></textarea>
           <button id="btn-clear" class="btn-clear" type="button" hidden>✕</button>
         </div>
 
         <div class="qr-zone">
           <div class="qr-empty" id="qr-empty">
-            <span class="qr-empty-line1">awaiting input</span>
-            <span class="qr-empty-line2">type or paste</span>
+            <span class="qr-empty-line1" data-i18n="awaitingInput">awaiting input</span>
+            <span class="qr-empty-line2" data-i18n="typeOrPaste">type or paste</span>
             <span class="blink-cursor"></span>
           </div>
           <div class="qr-svg-wrap" id="qr-svg-wrap" hidden></div>
@@ -639,26 +714,26 @@
         <div class="scan-title" id="scan-title">Scan to encode</div>
 
         <div class="scan-actions">
-          <button id="btn-copy" class="btn btn-copy" type="button" disabled>Copiar</button>
+          <button id="btn-copy" class="btn btn-copy" type="button" disabled data-i18n="copy">Copiar</button>
           <button id="btn-save" class="btn btn-save" type="button" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-4-7 4V4a1 1 0 0 1 1-1z" />
             </svg>
-            <span>Guardar</span>
+            <span data-i18n="save">Guardar</span>
           </button>
         </div>
 
         <div class="recents" id="recents">
-          <span class="recents-empty" id="recents-empty">no recent scans yet</span>
+          <span class="recents-empty" id="recents-empty" data-i18n="noRecents">no recent scans yet</span>
         </div>
       </section>
 
       <section id="view-list" class="view" hidden>
         <header class="list-header">
-          <h1>Mis códigos</h1>
+          <h1 data-i18n="myCodes">Mis códigos</h1>
           <div class="list-header-right">
-            <button id="btn-exit-list" class="btn-pill btn-neutral" type="button">Salir</button>
-            <button id="btn-new" class="btn-pill btn-green" type="button">+ Nuevo</button>
+            <button id="btn-exit-list" class="btn-pill btn-neutral" type="button" data-i18n="exit">Salir</button>
+            <button id="btn-new" class="btn-pill btn-green" type="button" data-i18n="newCode">+ Nuevo</button>
           </div>
         </header>
         <ul class="saved-list" id="saved-list"></ul>
@@ -666,20 +741,49 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-4-7 4V4a1 1 0 0 1 1-1z" />
           </svg>
-          <p>Sin códigos guardados.<br />Toca <span class="accent">+ Nuevo</span> para agregar uno.</p>
+          <p>
+            <span data-i18n="savedListEmpty">Sin códigos guardados.</span><br />
+            <span data-i18n="tap">Toca</span> <span class="accent" data-i18n="newCode">+ Nuevo</span>
+            <span data-i18n="savedListEmptyTail">para agregar uno.</span>
+          </p>
         </div>
       </section>
 
       <section id="view-form" class="view" hidden>
-        <h1 class="form-title">Nuevo código</h1>
-        <label class="form-label" for="form-name">Nombre (opcional)</label>
-        <input id="form-name" class="form-input" type="text" placeholder="Ej: Pedido #4521" />
-        <label class="form-label" for="form-value">Texto o ID a convertir</label>
-        <textarea id="form-value" class="form-textarea" rows="4" placeholder="PPL-4471-A22"></textarea>
+        <h1 class="form-title" data-i18n="formTitleNew">Nuevo código</h1>
+        <label class="form-label" for="form-name" data-i18n="formName">Nombre (opcional)</label>
+        <input id="form-name" class="form-input" type="text" data-i18n-placeholder="formNamePlaceholder" placeholder="Ej: Pedido #4521" />
+        <label class="form-label" for="form-value" data-i18n="formValue">Texto o ID a convertir</label>
+        <textarea id="form-value" class="form-textarea" rows="4" data-i18n-placeholder="formValuePlaceholder" placeholder="PPL-4471-A22"></textarea>
         <div class="form-spacer"></div>
         <div class="form-actions">
-          <button id="btn-form-cancel" class="btn-form-cancel" type="button">Cancelar</button>
-          <button id="btn-form-save" class="btn-form-save" type="button" disabled>Guardar</button>
+          <button id="btn-form-cancel" class="btn-form-cancel" type="button" data-i18n="cancel">Cancelar</button>
+          <button id="btn-form-save" class="btn-form-save" type="button" disabled data-i18n="save">Guardar</button>
+        </div>
+      </section>
+
+      <section id="view-settings" class="view" hidden>
+        <header class="list-header">
+          <h1 data-i18n="settingsTitle">Configuración</h1>
+          <div class="list-header-right">
+            <button id="btn-exit-settings" class="btn-pill btn-neutral" type="button" data-i18n="exit">Salir</button>
+          </div>
+        </header>
+        <div class="settings-body">
+          <div class="settings-row">
+            <span class="settings-row-label" data-i18n="languageLabel">Idioma</span>
+            <div class="lang-toggle">
+              <button id="btn-lang-es" class="lang-btn" type="button" data-lang="es">Español</button>
+              <button id="btn-lang-en" class="lang-btn" type="button" data-lang="en">English</button>
+            </div>
+          </div>
+          <div class="settings-row settings-row-danger">
+            <div class="settings-row-info">
+              <span class="settings-row-label" data-i18n="clearAllLabel">Limpiar todo</span>
+              <p class="settings-row-desc" data-i18n="clearAllDesc">Borra todos los códigos guardados y el historial reciente.</p>
+            </div>
+            <button id="btn-clear-all" class="btn-pill btn-danger" type="button" data-i18n="clearAllLabel">Limpiar todo</button>
+          </div>
         </div>
       </section>
     </div>

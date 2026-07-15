@@ -5,6 +5,80 @@
     <title>QR Tray</title>
     <style>
 
+      @font-face {
+        font-family: "Inter";
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+        src: url("assets/fonts/inter-latin-400-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+        src: url("assets/fonts/inter-latin-500-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+        src: url("assets/fonts/inter-latin-600-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+        src: url("assets/fonts/inter-latin-700-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+        src: url("assets/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+        src: url("assets/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "JetBrains Mono";
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+        src: url("assets/fonts/jetbrains-mono-latin-600-normal.woff2") format("woff2");
+      }
+
+      :root {
+        --ink: #1a1f2b;
+        --ink-dark: #0a0e14;
+        --gray-1: #4b5563;
+        --gray-2: #6b7280;
+        --gray-muted-1: #9aa1ad;
+        --gray-muted-2: #b6bcc7;
+        --green: #22c55e;
+        --green-shadow: rgba(34, 197, 94, 0.32);
+        --green-shadow-strong: rgba(34, 197, 94, 0.35);
+        --green-disabled-bg-scan: #eaf7ee;
+        --green-disabled-text: #a7d8b8;
+        --green-disabled-bg-form: #c9ecd5;
+        --soft-bg-1: #f2f3f6;
+        --soft-bg-2: #f7f8fa;
+        --neutral-btn-bg: #e6e8ec;
+        --border-1: #eceef2;
+        --border-2: #e2e4ea;
+        --type-ppl: #635bff;
+        --type-loc: #0f9d58;
+        --type-dock: #e8833a;
+        --type-raw: #6b7280;
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -14,216 +88,603 @@
         width: 360px;
         height: 480px;
         overflow: hidden;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f2f2f5;
-        color: #1c1c1e;
+        background: #f4f5f7;
+        color: var(--ink);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
-      #app {
+      body {
+        padding: 14px;
+      }
+      ::selection {
+        background: rgba(34, 197, 94, 0.18);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      button {
+        font: inherit;
+      }
+
+      #card {
+        width: 100%;
+        height: 100%;
+        border-radius: 22px;
+        background: #ffffff;
+        box-shadow: 0 12px 34px rgba(24, 28, 40, 0.12), 0 2px 6px rgba(24, 28, 40, 0.05);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .view {
         display: flex;
         flex-direction: column;
         height: 100%;
       }
 
-      #list-header {
+      .scan-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px;
+        padding: 16px 18px 8px;
       }
-      #list-header h1 {
-        font-size: 18px;
-        margin: 0;
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
-      #btn-new {
-        border: none;
-        background: #34c759;
-        color: white;
-        font-weight: 600;
-        font-size: 13px;
-        padding: 8px 14px;
-        border-radius: 20px;
+      .logo {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        background: var(--ink-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .logo-inner {
+        width: 11px;
+        height: 11px;
+        border: 2px solid #fff;
+        border-radius: 2px;
+      }
+      .brand-name {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .scan-header-right {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 999px;
+        background: var(--soft-bg-1);
+        border: 1px solid var(--border-1);
+      }
+      .pill-action {
+        padding: 5px 10px;
+        border: 1px solid var(--border-1);
         cursor: pointer;
       }
-      #list {
+      .pill-action svg {
+        width: 12px;
+        height: 12px;
+        color: var(--green);
+      }
+      .pill-action span {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-1);
+      }
+      .pill-shortcut {
+        padding: 5px 11px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gray-2);
+      }
+
+      .input-zone {
+        position: relative;
+        padding: 2px 18px 0;
+      }
+      #scan-input {
+        width: 100%;
+        resize: none;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--ink);
+        border-bottom: 1.5px solid var(--border-2);
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        letter-spacing: -0.01em;
+        padding: 6px 26px 8px 0;
+        transition: border-color 0.14s;
+      }
+      #scan-input.has-text {
+        border-bottom-color: var(--green);
+      }
+      #scan-input::placeholder {
+        color: var(--gray-muted-2);
+      }
+      .btn-clear {
+        position: absolute;
+        top: 0;
+        right: 18px;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        border: none;
+        background: var(--soft-bg-1);
+        color: #8b93a1;
+        font-size: 11px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .qr-zone {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 18px 6px;
+        overflow: hidden;
+      }
+      .qr-empty {
+        width: 186px;
+        height: 186px;
+        border: 1.5px dashed var(--border-2);
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .qr-empty span {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+      }
+      .qr-empty-line1 {
+        font-size: 12px;
+        color: var(--gray-muted-1);
+      }
+      .qr-empty-line2 {
+        font-size: 11px;
+        color: var(--gray-muted-2);
+      }
+      .blink-cursor {
+        width: 6px;
+        height: 13px;
+        background: var(--green);
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink {
+        0% {
+          opacity: 1;
+        }
+        50%,
+        100% {
+          opacity: 0;
+        }
+      }
+      .qr-svg-wrap svg {
+        display: block;
+        shape-rendering: crispEdges;
+      }
+
+      .qr-svg-wrap svg rect {
+        display: none;
+      }
+      .qr-svg-wrap svg path {
+        fill: var(--ink-dark);
+      }
+
+      .scan-title {
+        text-align: center;
+        padding: 0 18px 12px;
+        min-height: 22px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .scan-actions {
+        display: flex;
+        gap: 8px;
+        padding: 0 18px 12px;
+      }
+      .btn {
+        border: none;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.12s, color 0.12s, box-shadow 0.12s;
+      }
+      .btn-copy {
+        flex: 1;
+        padding: 13px 0;
+        background: var(--ink-dark);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(10, 14, 20, 0.18);
+      }
+      .btn-copy:disabled {
+        background: var(--neutral-btn-bg);
+        color: #a8aeb9;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+      .btn-save {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 13px 16px;
+        background: var(--green);
+        color: #fff;
+        box-shadow: 0 4px 12px var(--green-shadow);
+      }
+      .btn-save svg {
+        width: 15px;
+        height: 15px;
+      }
+      .btn-save:disabled {
+        background: var(--green-disabled-bg-scan);
+        color: var(--green-disabled-text);
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      .recents {
+        padding: 0 18px 14px;
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border-2) transparent;
+      }
+      .recents::-webkit-scrollbar {
+        height: 4px;
+      }
+      .recents::-webkit-scrollbar-thumb {
+        background: var(--border-2);
+        border-radius: 2px;
+      }
+      .recents-empty {
+        width: 100%;
+        text-align: center;
+        padding: 6px 0;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        color: var(--gray-muted-2);
+      }
+      .chip {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--soft-bg-2);
+        border: 1px solid var(--border-1);
+        border-radius: 8px;
+        padding: 5px 9px;
+        cursor: pointer;
+      }
+      .chip-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .chip-value {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        color: var(--gray-1);
+      }
+
+      #view-list {
+        background: #f4f5f7;
+      }
+      .list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+      }
+      .list-header h1 {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      .list-header-right {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-pill {
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+      .btn-neutral {
+        background: var(--neutral-btn-bg);
+        color: var(--gray-1);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 14px;
+      }
+      .btn-green {
+        background: var(--green);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 7px 14px;
+        box-shadow: 0 3px 10px var(--green-shadow-strong);
+      }
+      .saved-list {
         list-style: none;
         margin: 0;
-        padding: 0 12px 12px;
-        overflow-y: auto;
         flex: 1;
+        overflow-y: auto;
+        padding: 0 14px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
-      .row {
+      .saved-row {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        background: white;
-        border-radius: 14px;
-        padding: 14px 16px;
-        margin-bottom: 8px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        gap: 10px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 12px 12px 12px 14px;
+        box-shadow: 0 1px 3px rgba(24, 28, 40, 0.06);
+      }
+      .saved-row-main {
+        flex: 1;
+        min-width: 0;
         cursor: pointer;
       }
-      .row-label {
-        font-size: 14px;
-        font-weight: 500;
+      .saved-row-name {
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
       }
-      .row-delete {
+      .saved-row-value {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 400;
+        color: #8b93a1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .saved-row-value-only {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .saved-row-trash {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
         border: none;
         background: transparent;
-        font-size: 14px;
+        color: #c2c7d0;
         cursor: pointer;
-        opacity: 0.5;
-        padding: 4px;
-      }
-      .row-delete:hover {
-        opacity: 1;
-      }
-      #empty-state {
-        text-align: center;
-        color: #8e8e93;
-        font-size: 13px;
-        margin-top: 60px;
-        padding: 0 24px;
-        line-height: 1.5;
-      }
-
-      #form-new {
         display: flex;
-        flex-direction: column;
-        gap: 14px;
-        padding: 20px 16px;
+        align-items: center;
+        justify-content: center;
       }
-      #form-new label {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        font-size: 12px;
-        color: #6e6e73;
+      .saved-row-trash svg {
+        width: 17px;
+        height: 17px;
       }
-      #form-new input,
-      #form-new textarea {
-        font-family: inherit;
-        font-size: 14px;
-        border: 1px solid #d1d1d6;
-        border-radius: 10px;
-        padding: 10px;
-        resize: none;
-      }
-      #input-text {
-        height: 90px;
-      }
-
-      #detail {
+      .list-empty {
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 16px;
-        flex: 1;
-      }
-      #btn-back {
-        align-self: flex-start;
-        border: none;
-        background: transparent;
-        font-size: 14px;
-        color: #007aff;
-        cursor: pointer;
-        padding: 4px 0 12px;
-      }
-      #detail-label {
-        font-size: 17px;
-        margin: 0 0 16px;
+        justify-content: center;
+        gap: 12px;
+        padding: 0 34px;
         text-align: center;
       }
-      #detail-qr {
-        width: 240px;
-        height: 240px;
-        border-radius: 12px;
-        background: white;
-        padding: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      .list-empty svg {
+        width: 34px;
+        height: 34px;
+        color: #c2c7d0;
       }
-      #detail-text {
-        margin-top: 16px;
-        font-size: 12px;
-        color: #6e6e73;
-        word-break: break-all;
-        text-align: center;
-        max-width: 280px;
+      .list-empty p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--gray-muted-1);
+        line-height: 1.5;
+      }
+      .list-empty .accent {
+        color: var(--green);
+        font-weight: 600;
       }
 
+      #view-form {
+        background: #f4f5f7;
+        padding: 18px;
+      }
+      .form-title {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin: 0 0 16px;
+      }
+      .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-2);
+        margin-bottom: 6px;
+      }
+      .form-input,
+      .form-textarea {
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid var(--border-2);
+        border-radius: 11px;
+        padding: 12px 14px;
+        font-size: 14px;
+        color: var(--ink);
+        outline: none;
+        transition: border-color 0.14s;
+      }
+      .form-input {
+        font-family: "Inter", sans-serif;
+        margin-bottom: 16px;
+      }
+      .form-textarea {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        resize: none;
+      }
+      .form-textarea.has-text {
+        border-color: var(--green);
+      }
+      .form-input::placeholder,
+      .form-textarea::placeholder {
+        color: var(--gray-muted-2);
+      }
+      .form-spacer {
+        flex: 1;
+      }
       .form-actions {
         display: flex;
         gap: 10px;
-        margin-top: auto;
-        width: 100%;
       }
-      .form-actions button {
+      .btn-form-cancel {
         flex: 1;
+        padding: 13px 0;
+        border-radius: 12px;
         border: none;
-        border-radius: 20px;
-        padding: 10px;
         font-size: 14px;
         font-weight: 600;
+        color: var(--gray-1);
+        background: var(--neutral-btn-bg);
         cursor: pointer;
       }
-      #btn-cancel {
-        background: #e5e5ea;
-        color: #1c1c1e;
-      }
-      #form-new button[type="submit"] {
-        background: #34c759;
-        color: white;
-      }
-      #btn-delete {
-        background: #ff3b30;
-        color: white;
+      .btn-form-save {
+        flex: 1;
+        padding: 13px 0;
+        border-radius: 12px;
+        border: none;
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        background: var(--green);
+        box-shadow: 0 4px 12px var(--green-shadow);
+        cursor: pointer;
       }
 
-      [hidden] {
-        display: none !important;
+      .btn-form-save:disabled {
+        background: var(--green-disabled-bg-form);
+        color: var(--green-disabled-text);
+        box-shadow: none;
+        cursor: not-allowed;
       }
     </style>
   </head>
   <body>
-    <div id="app">
-      <header id="list-header">
-        <h1>Mis códigos</h1>
-        <button id="btn-new" type="button">+ Nuevo</button>
-      </header>
+    <div id="card">
+      <section id="view-scan" class="view">
+        <header class="scan-header">
+          <div class="brand">
+            <span class="logo"><span class="logo-inner"></span></span>
+            <span class="brand-name">QR Tray</span>
+          </div>
+          <div class="scan-header-right">
+            <button id="btn-my-codes" class="pill pill-action" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+              </svg>
+              <span id="saved-count">0</span>
+            </button>
+            <span class="pill pill-shortcut">⌘⇧Q</span>
+          </div>
+        </header>
 
-      <ul id="list"></ul>
-      <p id="empty-state" hidden>
-        Todavía no guardaste ningún código.<br />
-        Tocá “+ Nuevo” para crear el primero.
-      </p>
-
-      <form id="form-new" hidden>
-        <label>
-          Nombre (opcional)
-          <input id="input-label" placeholder="Ej: Pedido #4521" />
-        </label>
-        <label>
-          Texto o ID a convertir
-          <textarea id="input-text" required></textarea>
-        </label>
-        <div class="form-actions">
-          <button type="button" id="btn-cancel">Cancelar</button>
-          <button type="submit">Guardar</button>
+        <div class="input-zone">
+          <textarea id="scan-input" rows="1" placeholder="paste or type to encode…"></textarea>
+          <button id="btn-clear" class="btn-clear" type="button" hidden>✕</button>
         </div>
-      </form>
 
-      <div id="detail" hidden>
-        <button id="btn-back" type="button">← Volver</button>
-        <h2 id="detail-label"></h2>
-        <img id="detail-qr" alt="Código QR" />
-        <code id="detail-text"></code>
-        <div class="form-actions">
-          <button id="btn-delete" type="button">Eliminar</button>
+        <div class="qr-zone">
+          <div class="qr-empty" id="qr-empty">
+            <span class="qr-empty-line1">awaiting input</span>
+            <span class="qr-empty-line2">type or paste</span>
+            <span class="blink-cursor"></span>
+          </div>
+          <div class="qr-svg-wrap" id="qr-svg-wrap" hidden></div>
         </div>
-      </div>
+
+        <div class="scan-title" id="scan-title">Scan to encode</div>
+
+        <div class="scan-actions">
+          <button id="btn-copy" class="btn btn-copy" type="button" disabled>Copiar</button>
+          <button id="btn-save" class="btn btn-save" type="button" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+            </svg>
+            <span>Guardar</span>
+          </button>
+        </div>
+
+        <div class="recents" id="recents">
+          <span class="recents-empty" id="recents-empty">no recent scans yet</span>
+        </div>
+      </section>
+
+      <section id="view-list" class="view" hidden>
+        <header class="list-header">
+          <h1>Mis códigos</h1>
+          <div class="list-header-right">
+            <button id="btn-exit-list" class="btn-pill btn-neutral" type="button">Salir</button>
+            <button id="btn-new" class="btn-pill btn-green" type="button">+ Nuevo</button>
+          </div>
+        </header>
+        <ul class="saved-list" id="saved-list"></ul>
+        <div class="list-empty" id="list-empty" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3h12a1 1 0 0 1 1 1v16l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+          </svg>
+          <p>Sin códigos guardados.<br />Toca <span class="accent">+ Nuevo</span> para agregar uno.</p>
+        </div>
+      </section>
+
+      <section id="view-form" class="view" hidden>
+        <h1 class="form-title">Nuevo código</h1>
+        <label class="form-label" for="form-name">Nombre (opcional)</label>
+        <input id="form-name" class="form-input" type="text" placeholder="Ej: Pedido #4521" />
+        <label class="form-label" for="form-value">Texto o ID a convertir</label>
+        <textarea id="form-value" class="form-textarea" rows="4" placeholder="PPL-4471-A22"></textarea>
+        <div class="form-spacer"></div>
+        <div class="form-actions">
+          <button id="btn-form-cancel" class="btn-form-cancel" type="button">Cancelar</button>
+          <button id="btn-form-save" class="btn-form-save" type="button" disabled>Guardar</button>
+        </div>
+      </section>
     </div>
+
+    <script src="assets/vendor/qrcode-generator.js"></script>
     <script src="dist/renderer.js"></script>
   </body>
 </html>

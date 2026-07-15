@@ -1,7 +1,10 @@
-import { app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain } from "electron";
+import { app, BrowserWindow, Tray, Menu, globalShortcut, protocol, net } from "electron";
 import path from "path";
-import { listCodes, addCode, deleteCode } from "./store";
-import { textToQrDataUrl } from "./qr";
+import { pathToFileURL } from "url";
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } },
+]);
 
 let win: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -14,6 +17,14 @@ function positionWindowUnderTray(): void {
   const x = Math.round(trayBounds.x + trayBounds.width / 2 - winBounds.width / 2);
   const y = Math.round(trayBounds.y + trayBounds.height);
   win.setPosition(x, y, false);
+}
+
+function registerAppProtocol(): void {
+  protocol.handle("app", (request) => {
+    const url = new URL(request.url);
+    const filePath = path.join(__dirname, "..", decodeURIComponent(url.pathname));
+    return net.fetch(pathToFileURL(filePath).toString());
+  });
 }
 
 function toggleWindow(): void {
@@ -35,11 +46,10 @@ function createWindow(): void {
     frame: false,
     alwaysOnTop: true,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
     },
   });
-  win.loadFile(path.join(__dirname, "..", "index.html"));
+  win.loadURL("app://qrtray/index.html");
   win.setAlwaysOnTop(true, "floating");
 
   win.on("close", (event) => {
@@ -66,13 +76,6 @@ function createTray(): void {
   );
 }
 
-function registerIpc(): void {
-  ipcMain.handle("codes:list", () => listCodes());
-  ipcMain.handle("codes:add", (_event, label: string, text: string) => addCode(label, text));
-  ipcMain.handle("codes:delete", (_event, id: string) => deleteCode(id));
-  ipcMain.handle("codes:qr", (_event, text: string) => textToQrDataUrl(text));
-}
-
 function registerShortcut(): void {
   globalShortcut.register("CommandOrControl+Shift+Q", () => {
     toggleWindow();
@@ -80,10 +83,10 @@ function registerShortcut(): void {
 }
 
 app.whenReady().then(() => {
+  registerAppProtocol();
   createWindow();
   createTray();
   registerShortcut();
-  registerIpc();
 });
 
 app.on("before-quit", () => {

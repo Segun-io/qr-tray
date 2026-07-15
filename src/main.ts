@@ -51,6 +51,7 @@ function createWindow(): void {
   });
   win.loadURL("app://qrtray/index.html");
   win.setAlwaysOnTop(true, "floating");
+  win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
 
   win.on("close", (event) => {
     if (isQuitting) return;
@@ -60,7 +61,7 @@ function createWindow(): void {
 }
 
 function createTray(): void {
-  tray = new Tray(path.join(__dirname, "..", "assets", "icon.png"));
+  tray = new Tray(path.join(__dirname, "..", "assets", "iconTemplate.png"));
 
   tray.on("click", () => {
     toggleWindow();

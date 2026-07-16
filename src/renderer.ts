@@ -224,6 +224,10 @@ function applyTranslations(): void {
     const key = el.dataset.i18nPlaceholder;
     if (key) el.placeholder = t(key);
   });
+  document.querySelectorAll<HTMLElement>("[data-i18n-aria-label]").forEach((el) => {
+    const key = el.dataset.i18nAriaLabel;
+    if (key) el.setAttribute("aria-label", t(key));
+  });
   els.btnLangEs.classList.toggle("active", lang === "es");
   els.btnLangEn.classList.toggle("active", lang === "en");
 }

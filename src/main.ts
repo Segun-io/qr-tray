@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, globalShortcut, protocol, net } from "electron";
+import { app, BrowserWindow, Tray, Menu, globalShortcut, protocol, net, ipcMain } from "electron";
 import path from "path";
 import { pathToFileURL } from "url";
 
@@ -9,6 +9,8 @@ protocol.registerSchemesAsPrivileged([
 let win: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
+
+let pinned = true;
 
 function positionWindowUnderTray(): void {
   if (!tray || !win) return;
@@ -47,6 +49,7 @@ function createWindow(): void {
     alwaysOnTop: true,
     webPreferences: {
       nodeIntegration: false,
+      preload: path.join(__dirname, "preload.js"),
     },
   });
   win.loadURL("app://qrtray/index.html");
@@ -57,6 +60,10 @@ function createWindow(): void {
     if (isQuitting) return;
     event.preventDefault();
     win?.hide();
+  });
+
+  win.on("blur", () => {
+    if (!pinned) win?.hide();
   });
 }
 
@@ -82,6 +89,10 @@ function registerShortcut(): void {
     toggleWindow();
   });
 }
+
+ipcMain.on("set-pinned", (_event, value: boolean) => {
+  pinned = value;
+});
 
 app.whenReady().then(() => {
   registerAppProtocol();

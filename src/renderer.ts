@@ -1,3 +1,9 @@
+interface Window {
+  qrtray?: {
+    setPinned(pinned: boolean): void;
+  };
+}
+
 declare function qrcode(
   typeNumber: number,
   errorCorrectionLevel: "L" | "M" | "Q" | "H"
@@ -60,6 +66,10 @@ const translations: Record<Lang, Record<string, string>> = {
     themeLabel: "Tema",
     themeLight: "Claro",
     themeDark: "Oscuro",
+    pinLabel: "Ventana",
+    pinDesc: "Elegí si la ventana se queda fija o se oculta al hacer click afuera.",
+    pinFixed: "Fija",
+    pinAutohide: "Auto-ocultar",
     clearAllLabel: "Limpiar todo",
     clearAllDesc: "Borra todos los códigos guardados y el historial reciente.",
     clearAllConfirm:
@@ -95,6 +105,10 @@ const translations: Record<Lang, Record<string, string>> = {
     themeLabel: "Theme",
     themeLight: "Light",
     themeDark: "Dark",
+    pinLabel: "Window",
+    pinDesc: "Choose whether the window stays fixed or hides when you click outside.",
+    pinFixed: "Fixed",
+    pinAutohide: "Auto-hide",
     clearAllLabel: "Clear all",
     clearAllDesc: "Deletes all saved codes and the recent history.",
     clearAllConfirm:
@@ -108,6 +122,7 @@ const translations: Record<Lang, Record<string, string>> = {
 
 const LANG_KEY = "qrtray.lang";
 const THEME_KEY = "qrtray.theme";
+const PINNED_KEY = "qrtray.pinned";
 
 function loadLang(): Lang {
   const raw = localStorage.getItem(LANG_KEY);
@@ -120,8 +135,13 @@ function loadTheme(): Theme {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+function loadPinned(): boolean {
+  return localStorage.getItem(PINNED_KEY) !== "false";
+}
+
 let lang: Lang = loadLang();
 let theme: Theme = loadTheme();
+let pinned: boolean = loadPinned();
 
 function t(key: string): string {
   return translations[lang][key] ?? key;
@@ -208,6 +228,8 @@ const els = {
   btnLangEn: document.getElementById("btn-lang-en") as HTMLButtonElement,
   btnThemeLight: document.getElementById("btn-theme-light") as HTMLButtonElement,
   btnThemeDark: document.getElementById("btn-theme-dark") as HTMLButtonElement,
+  btnPinFixed: document.getElementById("btn-pin-fixed") as HTMLButtonElement,
+  btnPinAutohide: document.getElementById("btn-pin-autohide") as HTMLButtonElement,
   btnClearAll: document.getElementById("btn-clear-all") as HTMLButtonElement,
 };
 
@@ -268,6 +290,18 @@ function setTheme(next: Theme): void {
   theme = next;
   localStorage.setItem(THEME_KEY, theme);
   applyTheme();
+}
+
+function applyPinned(): void {
+  els.btnPinFixed.classList.toggle("active", pinned);
+  els.btnPinAutohide.classList.toggle("active", !pinned);
+}
+
+function setPinned(next: boolean): void {
+  pinned = next;
+  localStorage.setItem(PINNED_KEY, String(pinned));
+  applyPinned();
+  window.qrtray?.setPinned(pinned);
 }
 
 function renderQr(): void {
@@ -530,6 +564,8 @@ els.btnLangEs.addEventListener("click", () => setLang("es"));
 els.btnLangEn.addEventListener("click", () => setLang("en"));
 els.btnThemeLight.addEventListener("click", () => setTheme("light"));
 els.btnThemeDark.addEventListener("click", () => setTheme("dark"));
+els.btnPinFixed.addEventListener("click", () => setPinned(true));
+els.btnPinAutohide.addEventListener("click", () => setPinned(false));
 
 els.btnClearAll.addEventListener("click", () => {
   if (!confirm(t("clearAllConfirm"))) return;
@@ -546,6 +582,8 @@ els.btnClearAll.addEventListener("click", () => {
 
 applyTranslations();
 applyTheme();
+applyPinned();
+window.qrtray?.setPinned(pinned);
 renderSavedCount();
 renderRecentsChips();
 updateScanUI();

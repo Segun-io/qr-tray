@@ -842,7 +842,11 @@
         <header class="list-header">
           <h1 data-i18n="myCodes">Mis códigos</h1>
           <div class="list-header-right">
-            <button id="btn-exit-list" class="btn-pill btn-neutral" type="button" data-i18n="exit">Salir</button>
+            <button id="btn-exit-list" class="btn-pill btn-neutral btn-icon-neutral" type="button" data-i18n-aria-label="exit" aria-label="Salir">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </button>
             <button id="btn-new" class="btn-pill btn-green" type="button" data-i18n="newCode">+ Nuevo</button>
           </div>
         </header>

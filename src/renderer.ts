@@ -17,6 +17,7 @@ interface SavedCode {
 type View = "scan" | "list" | "form" | "settings";
 type CodeType = "PPL" | "LOC" | "DOCK" | "RAW";
 type Lang = "es" | "en";
+type Theme = "light" | "dark";
 
 const TYPE_COLOR: Record<CodeType, string> = {
   PPL: "#635bff",
@@ -56,6 +57,9 @@ const translations: Record<Lang, Record<string, string>> = {
     cancel: "Cancelar",
     settingsTitle: "Configuración",
     languageLabel: "Idioma",
+    themeLabel: "Tema",
+    themeLight: "Claro",
+    themeDark: "Oscuro",
     clearAllLabel: "Limpiar todo",
     clearAllDesc: "Borra todos los códigos guardados y el historial reciente.",
     clearAllConfirm:
@@ -88,6 +92,9 @@ const translations: Record<Lang, Record<string, string>> = {
     cancel: "Cancel",
     settingsTitle: "Settings",
     languageLabel: "Language",
+    themeLabel: "Theme",
+    themeLight: "Light",
+    themeDark: "Dark",
     clearAllLabel: "Clear all",
     clearAllDesc: "Deletes all saved codes and the recent history.",
     clearAllConfirm:
@@ -100,13 +107,21 @@ const translations: Record<Lang, Record<string, string>> = {
 };
 
 const LANG_KEY = "qrtray.lang";
+const THEME_KEY = "qrtray.theme";
 
 function loadLang(): Lang {
   const raw = localStorage.getItem(LANG_KEY);
   return raw === "en" ? "en" : "es";
 }
 
+function loadTheme(): Theme {
+  const raw = localStorage.getItem(THEME_KEY);
+  if (raw === "light" || raw === "dark") return raw;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
 let lang: Lang = loadLang();
+let theme: Theme = loadTheme();
 
 function t(key: string): string {
   return translations[lang][key] ?? key;
@@ -191,6 +206,8 @@ const els = {
   btnExitSettings: document.getElementById("btn-exit-settings") as HTMLButtonElement,
   btnLangEs: document.getElementById("btn-lang-es") as HTMLButtonElement,
   btnLangEn: document.getElementById("btn-lang-en") as HTMLButtonElement,
+  btnThemeLight: document.getElementById("btn-theme-light") as HTMLButtonElement,
+  btnThemeDark: document.getElementById("btn-theme-dark") as HTMLButtonElement,
   btnClearAll: document.getElementById("btn-clear-all") as HTMLButtonElement,
 };
 
@@ -238,6 +255,19 @@ function setLang(next: Lang): void {
   localStorage.setItem(LANG_KEY, lang);
   applyTranslations();
   updateScanUI();
+}
+
+function applyTheme(): void {
+  document.documentElement.dataset.theme = theme;
+  els.btnThemeLight.classList.toggle("active", theme === "light");
+  els.btnThemeDark.classList.toggle("active", theme === "dark");
+}
+
+function setTheme(next: Theme): void {
+  if (theme === next) return;
+  theme = next;
+  localStorage.setItem(THEME_KEY, theme);
+  applyTheme();
 }
 
 function renderQr(): void {
@@ -439,6 +469,8 @@ els.btnFormSave.addEventListener("click", () => {
 els.btnExitSettings.addEventListener("click", () => setView(saved.length > 0 ? "list" : "scan"));
 els.btnLangEs.addEventListener("click", () => setLang("es"));
 els.btnLangEn.addEventListener("click", () => setLang("en"));
+els.btnThemeLight.addEventListener("click", () => setTheme("light"));
+els.btnThemeDark.addEventListener("click", () => setTheme("dark"));
 
 els.btnClearAll.addEventListener("click", () => {
   if (!confirm(t("clearAllConfirm"))) return;
@@ -454,6 +486,7 @@ els.btnClearAll.addEventListener("click", () => {
 });
 
 applyTranslations();
+applyTheme();
 renderSavedCount();
 renderRecentsChips();
 updateScanUI();

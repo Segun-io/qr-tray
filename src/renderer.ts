@@ -309,13 +309,20 @@ function truncateChip(value: string): string {
   return value.length > 15 ? value.slice(0, 15) + "…" : value;
 }
 
+function deleteRecent(value: string): void {
+  recents = recents.filter((v) => v !== value);
+  persistRecents();
+  renderRecentsChips();
+}
+
 function renderRecentsChips(): void {
   els.recents.querySelectorAll(".chip").forEach((el) => el.remove());
   els.recentsEmpty.hidden = recents.length > 0;
   for (const value of recents) {
-    const chip = document.createElement("button");
-    chip.type = "button";
+    const chip = document.createElement("div");
     chip.className = "chip";
+    chip.setAttribute("role", "button");
+    chip.tabIndex = 0;
 
     const dot = document.createElement("span");
     dot.className = "chip-dot";
@@ -325,16 +332,68 @@ function renderRecentsChips(): void {
     label.className = "chip-value";
     label.textContent = truncateChip(value);
 
-    chip.appendChild(dot);
-    chip.appendChild(label);
-    chip.addEventListener("click", () => {
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "chip-delete";
+    del.textContent = "✕";
+    del.addEventListener("click", (event) => {
+      event.stopPropagation();
+      deleteRecent(value);
+    });
+
+    const activate = (): void => {
+      if (recentsDragMoved) return;
       text = value;
       els.scanInput.value = value;
       updateScanUI();
+    };
+    chip.addEventListener("click", activate);
+    chip.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        activate();
+      }
     });
+
+    chip.appendChild(dot);
+    chip.appendChild(label);
+    chip.appendChild(del);
     els.recents.appendChild(chip);
   }
 }
+
+let recentsDrag: { pointerId: number; startX: number; startScrollLeft: number } | null = null;
+let recentsDragMoved = false;
+
+els.recents.addEventListener("pointerdown", (event) => {
+  if (event.button !== 0) return;
+  recentsDrag = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startScrollLeft: els.recents.scrollLeft,
+  };
+  recentsDragMoved = false;
+});
+
+els.recents.addEventListener("pointermove", (event) => {
+  if (!recentsDrag) return;
+  const dx = event.clientX - recentsDrag.startX;
+  if (!recentsDragMoved && Math.abs(dx) > 4) {
+    recentsDragMoved = true;
+    els.recents.setPointerCapture(recentsDrag.pointerId);
+    els.recents.classList.add("dragging");
+  }
+  if (recentsDragMoved) {
+    els.recents.scrollLeft = recentsDrag.startScrollLeft - dx;
+  }
+});
+
+function endRecentsDrag(): void {
+  recentsDrag = null;
+  els.recents.classList.remove("dragging");
+}
+els.recents.addEventListener("pointerup", endRecentsDrag);
+els.recents.addEventListener("pointercancel", endRecentsDrag);
 
 function scheduleRecent(value: string): void {
   if (recentsTimer) clearTimeout(recentsTimer);

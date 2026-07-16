@@ -415,12 +415,19 @@
       }
 
       .recents {
-        padding: 0 18px 14px;
+
+        padding: 8px 18px 14px;
         display: flex;
         gap: 6px;
         overflow-x: auto;
         scrollbar-width: thin;
         scrollbar-color: var(--border-2) transparent;
+        cursor: grab;
+        user-select: none;
+      }
+      .recents.dragging {
+        cursor: grabbing;
+        scroll-snap-type: none;
       }
       .recents::-webkit-scrollbar {
         height: 4px;
@@ -438,6 +445,7 @@
         color: var(--gray-muted-2);
       }
       .chip {
+        position: relative;
         flex-shrink: 0;
         display: inline-flex;
         align-items: center;
@@ -447,6 +455,33 @@
         border-radius: 8px;
         padding: 5px 9px;
         cursor: pointer;
+      }
+
+      .chip-delete {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 2px solid var(--card-bg);
+        background: var(--gray-2);
+        color: var(--card-bg);
+        font-size: 8px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.12s, background-color 0.12s, border-color 0.12s;
+      }
+      .chip:hover .chip-delete,
+      .chip:focus-within .chip-delete {
+        opacity: 1;
+      }
+      .chip-delete:hover {
+        background: var(--danger-text);
       }
       .chip-dot {
         width: 6px;

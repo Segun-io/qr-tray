@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Tray, Menu, globalShortcut, protocol, net, ipcMain } from "electron";
 import path from "path";
+import fs from "fs";
 import { pathToFileURL } from "url";
 
 protocol.registerSchemesAsPrivileged([
@@ -11,6 +12,23 @@ let tray: Tray | null = null;
 let isQuitting = false;
 
 let pinned = true;
+
+let movable = false;
+
+const positionFile = path.join(app.getPath("userData"), "window-position.json");
+
+function loadSavedPosition(): { x: number; y: number } | null {
+  try {
+    const raw = JSON.parse(fs.readFileSync(positionFile, "utf-8"));
+    if (typeof raw.x === "number" && typeof raw.y === "number") return raw;
+  } catch {
+  }
+  return null;
+}
+
+function savePosition(x: number, y: number): void {
+  fs.writeFileSync(positionFile, JSON.stringify({ x, y }));
+}
 
 function positionWindowUnderTray(): void {
   if (!tray || !win) return;
@@ -34,7 +52,7 @@ function toggleWindow(): void {
   if (win.isVisible()) {
     win.hide();
   } else {
-    positionWindowUnderTray();
+    if (!movable) positionWindowUnderTray();
     win.show();
   }
 }
@@ -47,6 +65,7 @@ function createWindow(): void {
     resizable: false,
     frame: false,
     alwaysOnTop: true,
+    movable: false,
     webPreferences: {
       nodeIntegration: false,
       preload: path.join(__dirname, "preload.js"),
@@ -64,6 +83,12 @@ function createWindow(): void {
 
   win.on("blur", () => {
     if (!pinned) win?.hide();
+  });
+
+  win.on("moved", () => {
+    if (!movable || !win) return;
+    const [x, y] = win.getPosition();
+    savePosition(x, y);
   });
 }
 
@@ -92,6 +117,15 @@ function registerShortcut(): void {
 
 ipcMain.on("set-pinned", (_event, value: boolean) => {
   pinned = value;
+});
+
+ipcMain.on("set-movable", (_event, value: boolean) => {
+  movable = value;
+  win?.setMovable(value);
+  if (value) {
+    const saved = loadSavedPosition();
+    if (saved && win) win.setPosition(saved.x, saved.y, false);
+  }
 });
 
 app.whenReady().then(() => {

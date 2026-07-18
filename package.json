@@ -4,13 +4,34 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && electron ."
+    "start": "npm run build && electron .",
+    "dist": "npm run build && electron-builder --mac"
   },
   "devDependencies": {
     "electron": "^43.1.0",
+    "electron-builder": "^26.15.3",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "qrcode-generator": "^2.0.4"
+  },
+  "build": {
+    "appId": "com.tressh.qr-tray",
+    "productName": "QR Tray",
+    "asar": false,
+    "files": [
+      "dist/**/*",
+      "index.html",
+      "assets/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        "dmg"
+      ]
+    },
+    "directories": {
+      "output": "release"
+    }
   }
 }

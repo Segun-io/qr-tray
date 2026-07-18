@@ -1,6 +1,7 @@
 interface Window {
   qrtray?: {
     setPinned(pinned: boolean): void;
+    setMovable(movable: boolean): void;
   };
 }
 
@@ -70,6 +71,10 @@ const translations: Record<Lang, Record<string, string>> = {
     pinDesc: "Elegí si la ventana se queda fija o se oculta al hacer click afuera.",
     pinFixed: "Fija",
     pinAutohide: "Auto-ocultar",
+    moveLabel: "Posición",
+    moveDesc: "Desbloqueá para arrastrar la ventana desde arriba y dejarla donde quieras.",
+    moveLocked: "Bloqueada",
+    moveUnlocked: "Movible",
     clearAllLabel: "Limpiar todo",
     clearAllDesc: "Borra todos los códigos guardados y el historial reciente.",
     clearAllConfirm:
@@ -109,6 +114,10 @@ const translations: Record<Lang, Record<string, string>> = {
     pinDesc: "Choose whether the window stays fixed or hides when you click outside.",
     pinFixed: "Fixed",
     pinAutohide: "Auto-hide",
+    moveLabel: "Position",
+    moveDesc: "Unlock to drag the window from the top and place it wherever you want.",
+    moveLocked: "Locked",
+    moveUnlocked: "Movable",
     clearAllLabel: "Clear all",
     clearAllDesc: "Deletes all saved codes and the recent history.",
     clearAllConfirm:
@@ -123,6 +132,7 @@ const translations: Record<Lang, Record<string, string>> = {
 const LANG_KEY = "qrtray.lang";
 const THEME_KEY = "qrtray.theme";
 const PINNED_KEY = "qrtray.pinned";
+const MOVABLE_KEY = "qrtray.movable";
 
 function loadLang(): Lang {
   const raw = localStorage.getItem(LANG_KEY);
@@ -139,9 +149,14 @@ function loadPinned(): boolean {
   return localStorage.getItem(PINNED_KEY) !== "false";
 }
 
+function loadMovable(): boolean {
+  return localStorage.getItem(MOVABLE_KEY) === "true";
+}
+
 let lang: Lang = loadLang();
 let theme: Theme = loadTheme();
 let pinned: boolean = loadPinned();
+let movable: boolean = loadMovable();
 
 function t(key: string): string {
   return translations[lang][key] ?? key;
@@ -230,6 +245,8 @@ const els = {
   btnThemeDark: document.getElementById("btn-theme-dark") as HTMLButtonElement,
   btnPinFixed: document.getElementById("btn-pin-fixed") as HTMLButtonElement,
   btnPinAutohide: document.getElementById("btn-pin-autohide") as HTMLButtonElement,
+  btnMoveLocked: document.getElementById("btn-move-locked") as HTMLButtonElement,
+  btnMoveUnlocked: document.getElementById("btn-move-unlocked") as HTMLButtonElement,
   btnClearAll: document.getElementById("btn-clear-all") as HTMLButtonElement,
 };
 
@@ -302,6 +319,19 @@ function setPinned(next: boolean): void {
   localStorage.setItem(PINNED_KEY, String(pinned));
   applyPinned();
   window.qrtray?.setPinned(pinned);
+}
+
+function applyMovable(): void {
+  els.btnMoveLocked.classList.toggle("active", !movable);
+  els.btnMoveUnlocked.classList.toggle("active", movable);
+  document.body.classList.toggle("movable-unlocked", movable);
+}
+
+function setMovable(next: boolean): void {
+  movable = next;
+  localStorage.setItem(MOVABLE_KEY, String(movable));
+  applyMovable();
+  window.qrtray?.setMovable(movable);
 }
 
 function renderQr(): void {
@@ -566,6 +596,8 @@ els.btnThemeLight.addEventListener("click", () => setTheme("light"));
 els.btnThemeDark.addEventListener("click", () => setTheme("dark"));
 els.btnPinFixed.addEventListener("click", () => setPinned(true));
 els.btnPinAutohide.addEventListener("click", () => setPinned(false));
+els.btnMoveLocked.addEventListener("click", () => setMovable(false));
+els.btnMoveUnlocked.addEventListener("click", () => setMovable(true));
 
 els.btnClearAll.addEventListener("click", () => {
   if (!confirm(t("clearAllConfirm"))) return;
@@ -584,6 +616,8 @@ applyTranslations();
 applyTheme();
 applyPinned();
 window.qrtray?.setPinned(pinned);
+applyMovable();
+window.qrtray?.setMovable(movable);
 renderSavedCount();
 renderRecentsChips();
 updateScanUI();

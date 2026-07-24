@@ -64,7 +64,7 @@ const translations: Record<Lang, Record<string, string>> = {
     cancel: "Cancelar",
     settingsTitle: "Configuración",
     languageLabel: "Idioma",
-    themeLabel: "Tema",
+    themeLabel: "Apariencia",
     themeLight: "Claro",
     themeDark: "Oscuro",
     pinLabel: "Ventana",
@@ -107,7 +107,7 @@ const translations: Record<Lang, Record<string, string>> = {
     cancel: "Cancel",
     settingsTitle: "Settings",
     languageLabel: "Language",
-    themeLabel: "Theme",
+    themeLabel: "Appearance",
     themeLight: "Light",
     themeDark: "Dark",
     pinLabel: "Window",
@@ -239,10 +239,8 @@ const els = {
   viewSettings: document.getElementById("view-settings") as HTMLElement,
   btnSettings: document.getElementById("btn-settings") as HTMLButtonElement,
   btnExitSettings: document.getElementById("btn-exit-settings") as HTMLButtonElement,
-  btnLangEs: document.getElementById("btn-lang-es") as HTMLButtonElement,
-  btnLangEn: document.getElementById("btn-lang-en") as HTMLButtonElement,
-  btnThemeLight: document.getElementById("btn-theme-light") as HTMLButtonElement,
-  btnThemeDark: document.getElementById("btn-theme-dark") as HTMLButtonElement,
+  langSelect: document.getElementById("lang-select") as HTMLSelectElement,
+  themeSwitch: document.getElementById("theme-switch") as HTMLInputElement,
   btnPinFixed: document.getElementById("btn-pin-fixed") as HTMLButtonElement,
   btnPinAutohide: document.getElementById("btn-pin-autohide") as HTMLButtonElement,
   btnMoveLocked: document.getElementById("btn-move-locked") as HTMLButtonElement,
@@ -284,8 +282,7 @@ function applyTranslations(): void {
     const key = el.dataset.i18nAriaLabel;
     if (key) el.setAttribute("aria-label", t(key));
   });
-  els.btnLangEs.classList.toggle("active", lang === "es");
-  els.btnLangEn.classList.toggle("active", lang === "en");
+  els.langSelect.value = lang;
 }
 
 function setLang(next: Lang): void {
@@ -298,8 +295,7 @@ function setLang(next: Lang): void {
 
 function applyTheme(): void {
   document.documentElement.dataset.theme = theme;
-  els.btnThemeLight.classList.toggle("active", theme === "light");
-  els.btnThemeDark.classList.toggle("active", theme === "dark");
+  els.themeSwitch.checked = theme === "dark";
 }
 
 function setTheme(next: Theme): void {
@@ -590,10 +586,8 @@ els.btnFormSave.addEventListener("click", () => {
 });
 
 els.btnExitSettings.addEventListener("click", () => setView(saved.length > 0 ? "list" : "scan"));
-els.btnLangEs.addEventListener("click", () => setLang("es"));
-els.btnLangEn.addEventListener("click", () => setLang("en"));
-els.btnThemeLight.addEventListener("click", () => setTheme("light"));
-els.btnThemeDark.addEventListener("click", () => setTheme("dark"));
+els.langSelect.addEventListener("change", () => setLang(els.langSelect.value as Lang));
+els.themeSwitch.addEventListener("change", () => setTheme(els.themeSwitch.checked ? "dark" : "light"));
 els.btnPinFixed.addEventListener("click", () => setPinned(true));
 els.btnPinAutohide.addEventListener("click", () => setPinned(false));
 els.btnMoveLocked.addEventListener("click", () => setMovable(false));

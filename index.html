@@ -837,6 +837,103 @@
         background: var(--action-strong-bg);
         color: var(--action-strong-text);
       }
+      .select-wrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .settings-select {
+        appearance: none;
+        -webkit-appearance: none;
+        background: var(--soft-bg-1);
+        border: 1px solid var(--border-1);
+        border-radius: 999px;
+        padding: 8px 30px 8px 14px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--ink);
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.14s;
+      }
+      .settings-select:focus-visible {
+        border-color: var(--green);
+      }
+      .select-chevron {
+        position: absolute;
+        right: 10px;
+        width: 12px;
+        height: 12px;
+        color: var(--gray-2);
+        pointer-events: none;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .switch input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .switch-track {
+        width: 42px;
+        height: 25px;
+        background: var(--neutral-btn-bg);
+        border-radius: 999px;
+        position: relative;
+        transition: background-color 0.15s;
+      }
+      .switch-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        background: var(--card-bg);
+        box-shadow: 0 1px 3px rgba(24, 28, 40, 0.3);
+        transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .switch input:checked + .switch-track {
+        background: var(--action-strong-bg);
+      }
+      .switch input:checked + .switch-track .switch-thumb {
+        transform: translateX(17px);
+      }
+      .switch input:focus-visible + .switch-track {
+        outline: 2px solid var(--green);
+        outline-offset: 2px;
+      }
+      .switch-icon {
+        position: absolute;
+        top: 50%;
+        width: 12px;
+        height: 12px;
+        transform: translateY(-50%);
+        color: var(--card-bg);
+        pointer-events: none;
+      }
+      .switch-icon-moon {
+        left: 5px;
+      }
+      .switch-icon-sun {
+        right: 5px;
+        color: var(--gray-2);
+      }
+      .switch input:checked + .switch-track .switch-icon-sun {
+        color: var(--action-strong-text);
+      }
+      .switch input:checked + .switch-track .switch-icon-moon {
+        color: var(--action-strong-text);
+      }
       .btn-danger {
         flex-shrink: 0;
         background: var(--danger-bg);
@@ -966,17 +1063,30 @@
         <div class="settings-body">
           <div class="settings-row">
             <span class="settings-row-label" data-i18n="languageLabel">Idioma</span>
-            <div class="lang-toggle">
-              <button id="btn-lang-es" class="lang-btn" type="button" data-lang="es">Español</button>
-              <button id="btn-lang-en" class="lang-btn" type="button" data-lang="en">English</button>
+            <div class="select-wrap">
+              <select id="lang-select" class="settings-select" data-i18n-aria-label="languageLabel" aria-label="Idioma">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+              </select>
+              <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             </div>
           </div>
           <div class="settings-row">
-            <span class="settings-row-label" data-i18n="themeLabel">Tema</span>
-            <div class="lang-toggle">
-              <button id="btn-theme-light" class="lang-btn" type="button" data-theme-choice="light" data-i18n="themeLight">Claro</button>
-              <button id="btn-theme-dark" class="lang-btn" type="button" data-theme-choice="dark" data-i18n="themeDark">Oscuro</button>
-            </div>
+            <span class="settings-row-label" data-i18n="themeLabel">Apariencia</span>
+            <label class="switch">
+              <input id="theme-switch" type="checkbox" data-i18n-aria-label="themeLabel" aria-label="Apariencia" />
+              <span class="switch-track">
+                <svg class="switch-icon switch-icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                </svg>
+                <svg class="switch-icon switch-icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                </svg>
+                <span class="switch-thumb"></span>
+              </span>
+            </label>
           </div>
           <div class="settings-row">
             <div class="settings-row-info">

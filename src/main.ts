@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, globalShortcut, protocol, net, ipcMain } from "electron";
+import { app, BrowserWindow, Tray, Menu, globalShortcut, protocol, net, ipcMain, screen } from "electron";
 import path from "path";
 import fs from "fs";
 import { pathToFileURL } from "url";
@@ -15,6 +15,8 @@ let pinned = true;
 
 let movable = false;
 
+let lang = "es";
+
 const positionFile = path.join(app.getPath("userData"), "window-position.json");
 
 function loadSavedPosition(): { x: number; y: number } | null {
@@ -24,6 +26,18 @@ function loadSavedPosition(): { x: number; y: number } | null {
   } catch {
   }
   return null;
+}
+
+function isPointOnScreen(x: number, y: number): boolean {
+  return screen.getAllDisplays().some((display) => {
+    const area = display.workArea ?? display.bounds;
+    return (
+      x >= area.x &&
+      x < area.x + area.width &&
+      y >= area.y &&
+      y < area.y + area.height
+    );
+  });
 }
 
 function savePosition(x: number, y: number): void {
@@ -42,8 +56,12 @@ function positionWindowUnderTray(): void {
 function registerAppProtocol(): void {
   protocol.handle("app", (request) => {
     const url = new URL(request.url);
-    const filePath = path.join(__dirname, "..", decodeURIComponent(url.pathname));
-    return net.fetch(pathToFileURL(filePath).toString());
+    const root = path.resolve(__dirname, "..");
+    const resolved = path.resolve(root, "." + decodeURIComponent(url.pathname));
+    if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+      return new Response("Not found", { status: 404 });
+    }
+    return net.fetch(pathToFileURL(resolved).toString());
   });
 }
 
@@ -92,6 +110,18 @@ function createWindow(): void {
   });
 }
 
+function updateTrayMenu(): void {
+  if (!tray) return;
+  tray.setContextMenu(
+    Menu.buildFromTemplate([
+      {
+        label: lang === "en" ? "Exit" : "Salir",
+        click: () => app.quit(),
+      },
+    ])
+  );
+}
+
 function createTray(): void {
   tray = new Tray(path.join(__dirname, "..", "assets", "iconTemplate.png"));
 
@@ -99,14 +129,7 @@ function createTray(): void {
     toggleWindow();
   });
 
-  tray.setContextMenu(
-    Menu.buildFromTemplate([
-      {
-        label: "Salir",
-        click: () => app.quit(),
-      },
-    ])
-  );
+  updateTrayMenu();
 }
 
 function registerShortcut(): void {
@@ -124,11 +147,19 @@ ipcMain.on("set-movable", (_event, value: boolean) => {
   win?.setMovable(value);
   if (value) {
     const saved = loadSavedPosition();
-    if (saved && win) win.setPosition(saved.x, saved.y, false);
+    if (saved && win && isPointOnScreen(saved.x, saved.y)) {
+      win.setPosition(saved.x, saved.y, false);
+    }
   }
 });
 
+ipcMain.on("set-lang", (_event, value: string) => {
+  lang = value === "en" ? "en" : "es";
+  updateTrayMenu();
+});
+
 app.whenReady().then(() => {
+  if (process.platform === "darwin") app.dock?.hide();
   registerAppProtocol();
   createWindow();
   createTray();
@@ -140,10 +171,8 @@ app.on("before-quit", () => {
 });
 
 app.on("window-all-closed", () => {
-  console.log("window-all-closed disparado")
-})
+});
 
 app.on("will-quit", () => {
-  console.log("will quit disparado");
   globalShortcut.unregisterAll();
 });

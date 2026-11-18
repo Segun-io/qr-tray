@@ -2,6 +2,7 @@ interface Window {
   qrtray?: {
     setPinned(pinned: boolean): void;
     setMovable(movable: boolean): void;
+    setLang(lang: string): void;
   };
 }
 
@@ -52,6 +53,7 @@ const translations: Record<Lang, Record<string, string>> = {
     noRecents: "sin escaneos recientes",
     copy: "Copiar",
     copied: "✓ Copiado",
+    copyError: "✕ Error",
     save: "Guardar",
     savedListEmpty: "Sin códigos guardados.",
     tap: "Toca",
@@ -95,6 +97,7 @@ const translations: Record<Lang, Record<string, string>> = {
     noRecents: "no recent scans yet",
     copy: "Copy",
     copied: "✓ Copied",
+    copyError: "✕ Error",
     save: "Save",
     savedListEmpty: "No saved codes.",
     tap: "Tap",
@@ -163,14 +166,14 @@ function t(key: string): string {
 }
 
 function detectType(raw: string): CodeType {
-  const t = raw.trim().toUpperCase();
-  if (t.startsWith("PPL")) return "PPL";
-  if (t.startsWith("LOC")) return "LOC";
+  const value = raw.trim().toUpperCase();
+  if (value.startsWith("PPL")) return "PPL";
+  if (value.startsWith("LOC")) return "LOC";
   if (
-    t.startsWith("DOCK") ||
-    t.startsWith("WHDOCK") ||
-    t.startsWith("WAREHOUSE") ||
-    t.startsWith("WH-")
+    value.startsWith("DOCK") ||
+    value.startsWith("WHDOCK") ||
+    value.startsWith("WAREHOUSE") ||
+    value.startsWith("WH-")
   ) {
     return "DOCK";
   }
@@ -289,6 +292,7 @@ function setLang(next: Lang): void {
   if (lang === next) return;
   lang = next;
   localStorage.setItem(LANG_KEY, lang);
+  window.qrtray?.setLang(lang);
   applyTranslations();
   updateScanUI();
 }
@@ -551,8 +555,12 @@ els.btnClear.addEventListener("click", () => clearScanInput());
 
 els.btnCopy.addEventListener("click", async () => {
   if (!text) return;
-  await navigator.clipboard.writeText(text);
-  els.btnCopy.textContent = t("copied");
+  try {
+    await navigator.clipboard.writeText(text);
+    els.btnCopy.textContent = t("copied");
+  } catch {
+    els.btnCopy.textContent = t("copyError");
+  }
   if (copyResetTimer) clearTimeout(copyResetTimer);
   copyResetTimer = setTimeout(() => {
     els.btnCopy.textContent = t("copy");
@@ -607,6 +615,7 @@ els.btnClearAll.addEventListener("click", () => {
 });
 
 applyTranslations();
+window.qrtray?.setLang(lang);
 applyTheme();
 applyPinned();
 window.qrtray?.setPinned(pinned);

@@ -152,10 +152,8 @@ const els = {
   btnExitSettings: document.getElementById("btn-exit-settings") as HTMLButtonElement,
   langSelect: document.getElementById("lang-select") as HTMLSelectElement,
   themeSwitch: document.getElementById("theme-switch") as HTMLInputElement,
-  btnPinFixed: document.getElementById("btn-pin-fixed") as HTMLButtonElement,
-  btnPinAutohide: document.getElementById("btn-pin-autohide") as HTMLButtonElement,
-  btnMoveLocked: document.getElementById("btn-move-locked") as HTMLButtonElement,
-  btnMoveUnlocked: document.getElementById("btn-move-unlocked") as HTMLButtonElement,
+  pinSwitch: document.getElementById("pin-switch") as HTMLInputElement,
+  moveSwitch: document.getElementById("move-switch") as HTMLInputElement,
   btnClearAll: document.getElementById("btn-clear-all") as HTMLButtonElement,
 };
 
@@ -219,8 +217,7 @@ function setTheme(next: Theme): void {
 }
 
 function applyPinned(): void {
-  els.btnPinFixed.classList.toggle("active", pinned);
-  els.btnPinAutohide.classList.toggle("active", !pinned);
+  els.pinSwitch.checked = !pinned;
 }
 
 function setPinned(next: boolean): void {
@@ -231,8 +228,7 @@ function setPinned(next: boolean): void {
 }
 
 function applyMovable(): void {
-  els.btnMoveLocked.classList.toggle("active", !movable);
-  els.btnMoveUnlocked.classList.toggle("active", movable);
+  els.moveSwitch.checked = movable;
   document.body.classList.toggle("movable-unlocked", movable);
 }
 
@@ -505,10 +501,8 @@ els.btnFormSave.addEventListener("click", () => {
 els.btnExitSettings.addEventListener("click", () => setView(saved.length > 0 ? "list" : "scan"));
 els.langSelect.addEventListener("change", () => setLang(els.langSelect.value as Lang));
 els.themeSwitch.addEventListener("change", () => setTheme(els.themeSwitch.checked ? "dark" : "light"));
-els.btnPinFixed.addEventListener("click", () => setPinned(true));
-els.btnPinAutohide.addEventListener("click", () => setPinned(false));
-els.btnMoveLocked.addEventListener("click", () => setMovable(false));
-els.btnMoveUnlocked.addEventListener("click", () => setMovable(true));
+els.pinSwitch.addEventListener("change", () => setPinned(!els.pinSwitch.checked));
+els.moveSwitch.addEventListener("change", () => setMovable(els.moveSwitch.checked));
 
 els.btnClearAll.addEventListener("click", () => {
   if (!confirm(t("clearAllConfirm"))) return;

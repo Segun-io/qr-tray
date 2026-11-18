@@ -789,6 +789,9 @@
         background: var(--page-bg);
       }
       .settings-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -796,47 +799,28 @@
       }
       .settings-row {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
+        flex-direction: column;
+        gap: 10px;
         background: var(--surface);
         border-radius: 12px;
         padding: 14px;
         box-shadow: var(--row-shadow);
       }
+      .settings-row-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
       .settings-row-label {
         font-size: 13px;
         font-weight: 600;
       }
-      .settings-row-info {
-        min-width: 0;
-      }
       .settings-row-desc {
-        margin: 4px 0 0;
+        margin: 0;
         font-size: 11px;
         line-height: 1.4;
         color: var(--gray-muted-1);
-      }
-      .lang-toggle {
-        display: flex;
-        background: var(--soft-bg-1);
-        border-radius: 999px;
-        padding: 3px;
-        gap: 2px;
-      }
-      .lang-btn {
-        border: none;
-        background: transparent;
-        border-radius: 999px;
-        padding: 6px 12px;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--gray-2);
-        cursor: pointer;
-      }
-      .lang-btn.active {
-        background: var(--action-strong-bg);
-        color: var(--action-strong-text);
       }
       .select-wrap {
         position: relative;
@@ -1063,64 +1047,69 @@
         </header>
         <div class="settings-body">
           <div class="settings-row">
-            <span class="settings-row-label" data-i18n="languageLabel">Idioma</span>
-            <div class="select-wrap">
-              <select id="lang-select" class="settings-select" data-i18n-aria-label="languageLabel" aria-label="Idioma">
-                <option value="es">Español</option>
-                <option value="en">English</option>
-              </select>
-              <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </div>
-          </div>
-          <div class="settings-row">
-            <span class="settings-row-label" data-i18n="themeLabel">Apariencia</span>
-            <label class="switch">
-              <input id="theme-switch" type="checkbox" data-i18n-aria-label="themeLabel" aria-label="Apariencia" />
-              <span class="switch-track">
-                <svg class="switch-icon switch-icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+            <div class="settings-row-head">
+              <span class="settings-row-label" data-i18n="languageLabel">Idioma</span>
+              <div class="select-wrap">
+                <select id="lang-select" class="settings-select" data-i18n-aria-label="languageLabel" aria-label="Idioma">
+                  <option value="es">Español</option>
+                  <option value="en">English</option>
+                </select>
+                <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m6 9 6 6 6-6" />
                 </svg>
-                <svg class="switch-icon switch-icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-                </svg>
-                <span class="switch-thumb"></span>
-              </span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-info">
-              <span class="settings-row-label" data-i18n="pinLabel">Ventana</span>
-              <p class="settings-row-desc" data-i18n="pinDesc">Elegí si la ventana se queda fija o se oculta al hacer click afuera.</p>
-            </div>
-            <div class="lang-toggle">
-              <button id="btn-pin-fixed" class="lang-btn" type="button" data-i18n="pinFixed">Fija</button>
-              <button id="btn-pin-autohide" class="lang-btn" type="button" data-i18n="pinAutohide">Auto-ocultar</button>
+              </div>
             </div>
           </div>
           <div class="settings-row">
-            <div class="settings-row-info">
-              <span class="settings-row-label" data-i18n="moveLabel">Posición</span>
-              <p class="settings-row-desc" data-i18n="moveDesc">Desbloqueá para arrastrar la ventana desde arriba y dejarla donde quieras.</p>
+            <div class="settings-row-head">
+              <span class="settings-row-label" data-i18n="themeLabel">Apariencia</span>
+              <label class="switch">
+                <input id="theme-switch" type="checkbox" data-i18n-aria-label="themeLabel" aria-label="Apariencia" />
+                <span class="switch-track">
+                  <svg class="switch-icon switch-icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                  </svg>
+                  <svg class="switch-icon switch-icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                  </svg>
+                  <span class="switch-thumb"></span>
+                </span>
+              </label>
             </div>
-            <div class="lang-toggle">
-              <button id="btn-move-locked" class="lang-btn" type="button" data-i18n="moveLocked">Bloqueada</button>
-              <button id="btn-move-unlocked" class="lang-btn" type="button" data-i18n="moveUnlocked">Movible</button>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-head">
+              <span class="settings-row-label" data-i18n="pinAutohide">Auto-ocultar</span>
+              <label class="switch">
+                <input id="pin-switch" type="checkbox" data-i18n-aria-label="pinAutohide" aria-label="Auto-ocultar" />
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </label>
             </div>
+            <p class="settings-row-desc" data-i18n="pinDesc">Oculta la ventana al hacer clic afuera.</p>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-head">
+              <span class="settings-row-label" data-i18n="moveLabel">Ventana movible</span>
+              <label class="switch">
+                <input id="move-switch" type="checkbox" data-i18n-aria-label="moveLabel" aria-label="Ventana movible" />
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </label>
+            </div>
+            <p class="settings-row-desc" data-i18n="moveDesc">Arrástrala desde arriba para reubicarla.</p>
           </div>
           <div class="settings-row settings-row-danger">
-            <div class="settings-row-info">
+            <div class="settings-row-head">
               <span class="settings-row-label" data-i18n="clearAllLabel">Limpiar todo</span>
-              <p class="settings-row-desc" data-i18n="clearAllDesc">Borra todos los códigos guardados y el historial reciente.</p>
+              <button id="btn-clear-all" class="btn-pill btn-danger" type="button" data-i18n="clearAllLabel">Limpiar todo</button>
             </div>
-            <button id="btn-clear-all" class="btn-pill btn-danger" type="button" data-i18n="clearAllLabel">Limpiar todo</button>
+            <p class="settings-row-desc" data-i18n="clearAllDesc">Borra todos los códigos guardados y el historial reciente.</p>
           </div>
         </div>
       </section>
     </div>
 
     <script src="assets/vendor/qrcode-generator.js"></script>
+    <script src="dist/i18n.js"></script>
     <script src="dist/renderer.js"></script>
   </body>
 </html>

@@ -24,7 +24,6 @@ interface SavedCode {
 
 type View = "scan" | "list" | "form" | "settings";
 type CodeType = "PPL" | "LOC" | "DOCK" | "RAW";
-type Lang = "es" | "en";
 type Theme = "light" | "dark";
 
 const TYPE_COLOR: Record<CodeType, string> = {
@@ -34,102 +33,11 @@ const TYPE_COLOR: Record<CodeType, string> = {
   RAW: "#6b7280",
 };
 
-const TYPE_LABEL_KEY: Record<CodeType, string> = {
+const TYPE_LABEL_KEY: Record<CodeType, TKey> = {
   PPL: "typePpl",
   LOC: "typeLoc",
   DOCK: "typeDock",
   RAW: "typeRaw",
-};
-
-const translations: Record<Lang, Record<string, string>> = {
-  es: {
-    myCodes: "Mis códigos",
-    exit: "Salir",
-    newCode: "+ Nuevo",
-    scanPlaceholder: "pegá o escribí para codificar…",
-    scanTitleDefault: "Escaneá para codificar",
-    awaitingInput: "esperando input",
-    typeOrPaste: "escribí o pegá",
-    noRecents: "sin escaneos recientes",
-    copy: "Copiar",
-    copied: "✓ Copiado",
-    copyError: "✕ Error",
-    save: "Guardar",
-    savedListEmpty: "Sin códigos guardados.",
-    tap: "Tocá",
-    savedListEmptyTail: "para agregar uno.",
-    formTitleNew: "Nuevo código",
-    formName: "Nombre (opcional)",
-    formNamePlaceholder: "Ej: Pedido #4521",
-    formValue: "Texto o ID a convertir",
-    formValuePlaceholder: "PPL-4471-A22",
-    cancel: "Cancelar",
-    settingsTitle: "Configuración",
-    languageLabel: "Idioma",
-    themeLabel: "Apariencia",
-    themeLight: "Claro",
-    themeDark: "Oscuro",
-    pinLabel: "Ventana",
-    pinDesc: "Elegí si la ventana se queda fija o se oculta al hacer click afuera.",
-    pinFixed: "Fija",
-    pinAutohide: "Auto-ocultar",
-    moveLabel: "Posición",
-    moveDesc: "Desbloqueá para arrastrar la ventana desde arriba y dejarla donde quieras.",
-    moveLocked: "Bloqueada",
-    moveUnlocked: "Movible",
-    clearAllLabel: "Limpiar todo",
-    clearAllDesc: "Borra todos los códigos guardados y el historial reciente.",
-    clearAllConfirm:
-      "¿Seguro que querés borrar todos los códigos guardados y el historial? Esta acción no se puede deshacer.",
-    typePpl: "PPL · Paquete",
-    typeLoc: "LOC · Ubicación",
-    typeDock: "DOCK · Depósito",
-    typeRaw: "Valor crudo",
-  },
-  en: {
-    myCodes: "My codes",
-    exit: "Exit",
-    newCode: "+ New",
-    scanPlaceholder: "paste or type to encode…",
-    scanTitleDefault: "Scan to encode",
-    awaitingInput: "awaiting input",
-    typeOrPaste: "type or paste",
-    noRecents: "no recent scans yet",
-    copy: "Copy",
-    copied: "✓ Copied",
-    copyError: "✕ Error",
-    save: "Save",
-    savedListEmpty: "No saved codes.",
-    tap: "Tap",
-    savedListEmptyTail: "to add one.",
-    formTitleNew: "New code",
-    formName: "Name (optional)",
-    formNamePlaceholder: "E.g: Order #4521",
-    formValue: "Text or ID to encode",
-    formValuePlaceholder: "PPL-4471-A22",
-    cancel: "Cancel",
-    settingsTitle: "Settings",
-    languageLabel: "Language",
-    themeLabel: "Appearance",
-    themeLight: "Light",
-    themeDark: "Dark",
-    pinLabel: "Window",
-    pinDesc: "Choose whether the window stays fixed or hides when you click outside.",
-    pinFixed: "Fixed",
-    pinAutohide: "Auto-hide",
-    moveLabel: "Position",
-    moveDesc: "Unlock to drag the window from the top and place it wherever you want.",
-    moveLocked: "Locked",
-    moveUnlocked: "Movable",
-    clearAllLabel: "Clear all",
-    clearAllDesc: "Deletes all saved codes and the recent history.",
-    clearAllConfirm:
-      "Are you sure you want to delete all saved codes and the history? This cannot be undone.",
-    typePpl: "PPL · Package",
-    typeLoc: "LOC · Location",
-    typeDock: "DOCK · Warehouse",
-    typeRaw: "Raw value",
-  },
 };
 
 const LANG_KEY = "qrtray.lang";
@@ -161,7 +69,7 @@ let theme: Theme = loadTheme();
 let pinned: boolean = loadPinned();
 let movable: boolean = loadMovable();
 
-function t(key: string): string {
+function t(key: TKey): string {
   return translations[lang][key] ?? key;
 }
 
@@ -275,15 +183,15 @@ function applyTranslations(): void {
   document.documentElement.lang = lang;
   document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
-    if (key) el.textContent = t(key);
+    if (key) el.textContent = t(key as TKey);
   });
   document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("[data-i18n-placeholder]").forEach((el) => {
     const key = el.dataset.i18nPlaceholder;
-    if (key) el.placeholder = t(key);
+    if (key) el.placeholder = t(key as TKey);
   });
   document.querySelectorAll<HTMLElement>("[data-i18n-aria-label]").forEach((el) => {
     const key = el.dataset.i18nAriaLabel;
-    if (key) el.setAttribute("aria-label", t(key));
+    if (key) el.setAttribute("aria-label", t(key as TKey));
   });
   els.langSelect.value = lang;
 }

@@ -174,6 +174,7 @@ function setView(next: View): void {
   els.viewSettings.hidden = next !== "settings";
   if (next === "scan") {
     renderQr();
+    els.scanInput.focus();
   } else if (next === "list") {
     renderSavedList();
   }
@@ -533,3 +534,7 @@ renderSavedCount();
 renderRecentsChips();
 updateScanUI();
 setView("scan");
+
+window.addEventListener("focus", () => {
+  if (view === "scan") els.scanInput.focus();
+});

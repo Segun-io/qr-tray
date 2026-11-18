@@ -71,7 +71,9 @@ function toggleWindow(): void {
     win.hide();
   } else {
     if (!movable) positionWindowUnderTray();
+    if (process.platform === "darwin") app.focus({ steal: true });
     win.show();
+    win.focus();
   }
 }
 
